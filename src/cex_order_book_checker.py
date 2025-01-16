@@ -69,46 +69,46 @@ def calculate_buy_price(asks: List[List[float]], investment: float) -> Tuple[flo
 
     return total_quantity, average_price
 
-def calculate_sell_price(bids: List[List[float]], sell_quantity: float) -> Tuple[float, float]:
-    """
-    指定数量を売却する場合の平均価格と売却可能な数量を計算する。
+# def calculate_sell_price(bids: List[List[float]], sell_quantity: float) -> Tuple[float, float]:
+#     """
+#     指定数量を売却する場合の平均価格と売却可能な数量を計算する。
 
-    Args:
-        bids (List[List[float]]): オーダーブックのBidsリスト。各リストは[価格, 数量]を含む。
-        sell_quantity (float): 売却したい数量。
+#     Args:
+#         bids (List[List[float]]): オーダーブックのBidsリスト。各リストは[価格, 数量]を含む。
+#         sell_quantity (float): 売却したい数量。
 
-    Returns:
-        Tuple[float, float]: (売却可能な数量, 平均価格)
-    """
-    total_quantity = 0.0
-    total_value = 0.0
-    remaining_quantity = sell_quantity
+#     Returns:
+#         Tuple[float, float]: (売却可能な数量, 平均価格)
+#     """
+#     total_quantity = 0.0
+#     total_value = 0.0
+#     remaining_quantity = sell_quantity
 
-    for bid in bids:
-        price, available_quantity = bid
-        if isinstance(available_quantity, str):
-            available_quantity = float(available_quantity)
-        if isinstance(price, str):
-            price = float(price)
+#     for bid in bids:
+#         price, available_quantity = bid
+#         if isinstance(available_quantity, str):
+#             available_quantity = float(available_quantity)
+#         if isinstance(price, str):
+#             price = float(price)
 
-        if available_quantity <= remaining_quantity:
-            # この価格帯の数量をすべて使用
-            total_quantity += available_quantity
-            total_value += price * available_quantity
-            remaining_quantity -= available_quantity
-        else:
-            # 残り数量だけ使用
-            total_quantity += remaining_quantity
-            total_value += price * remaining_quantity
-            remaining_quantity = 0
-            break
+#         if available_quantity <= remaining_quantity:
+#             # この価格帯の数量をすべて使用
+#             total_quantity += available_quantity
+#             total_value += price * available_quantity
+#             remaining_quantity -= available_quantity
+#         else:
+#             # 残り数量だけ使用
+#             total_quantity += remaining_quantity
+#             total_value += price * remaining_quantity
+#             remaining_quantity = 0
+#             break
 
-    if total_quantity == 0:
-        average_price = 0.0
-    else:
-        average_price = total_value / total_quantity
+#     if total_quantity == 0:
+#         average_price = 0.0
+#     else:
+#         average_price = total_value / total_quantity
 
-    return total_quantity, average_price
+#     return total_quantity, average_price
 
 # 使用例
 
