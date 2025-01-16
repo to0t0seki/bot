@@ -1,5 +1,5 @@
 from dex_rate_checker import DexRateChecker
-from cex_order_book_checker import CexOrderBookChecker, calculate_sell_price
+from cex_order_book_checker import get_orderbook_bitget, calculate_sell_price
 import time
 from bitgetSpotClient import BitgetSpotClient as client
 client = client()
@@ -18,7 +18,7 @@ def auto_place_order():
     oas_amount = buy_amount * geek_oas_price
     print(f'OAS購入数量: {oas_amount}')
 
-    oas_bids_orderbook = CexOrderBookChecker('OASUSDT').fetch_orderbook('bids')
+    oas_bids_orderbook = get_orderbook_bitget('OASUSDT','bids')
 
     sell_amount, sell_price = calculate_sell_price(oas_bids_orderbook, oas_amount)
 
@@ -44,7 +44,7 @@ def auto_place_order():
         oas_amount = buy_amount * geek_oas_price
         print(f'OAS購入数量: {oas_amount}')
 
-        oas_bids_orderbook = CexOrderBookChecker('OASUSDT').fetch_orderbook('bids')
+        oas_bids_orderbook = get_orderbook_bitget('OASUSDT','bids')
 
         sell_amount, sell_price = calculate_sell_price(oas_bids_orderbook, oas_amount)
 

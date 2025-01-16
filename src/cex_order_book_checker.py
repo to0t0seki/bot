@@ -1,10 +1,7 @@
 import requests
-import os
 from typing import List, Tuple
-import time
-import hmac
-import base64
 import logging
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 handler = logging.StreamHandler()
@@ -12,67 +9,26 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(messag
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
-class BybitOrderBookChecker:
-    def __init__(self, symbol: str):
-        self.symbol = symbol
-        self.base_url = f"https://api.bitget.com/api/v2/spot/market/merge-depth?symbol={symbol}&precision=scale0&limit=15"
 
-    def fetch_orderbook(self,side: str):
-        try:
-            response = requests.get(self.base_url)
-            return response.json()['data'][side]
-        except Exception as e:
-            logger.error(f"エラーが発生しました: {e}")
-            return []
-
-def fetch_orderbook_bybit_OAS():
-        url = "https://api.bybit.com/v5/market/orderbook?category=spot&symbol=OASUSDT&limit=15"
+   
+def get_orderbook_bitget(symbol: str,side: str):
+    url = f"https://api.bitget.com/api/v2/spot/market/merge-depth?symbol={symbol}&precision=scale0&limit=15"
+    try:
         response = requests.get(url)
-        return response.json()['result']['b']
-
-
-
-
-    
-class CexOrderBookChecker2:
-    def __init__(self, symbol: str):
-        self.api_key = os.getenv('ACCESS')
-        self.secret_key = os.getenv('SECRET')
-        self.passphrase = os.getenv('PASS')
-        self.symbol = symbol
-        self.base_url = f"https://api.bitget.com/api/v2/spot/market/merge-depth?symbol={symbol}&precision=scale0&limit=15"
-
-    def fetch_orderbook(self,side: str):
-        response = requests.get(self.base_url)
         return response.json()['data'][side]
-    
-    def get_timestamp():
-        return int(time.time() * 1000)
+    except Exception as e:
+        logger.error(f"エラーが発生しました: {e}")
+        return []
 
+def get_orderbook_bybit(symbol: str,side: str):
+    url = f"https://api.bybit.com/v5/market/orderbook?category=spot&symbol={symbol}&limit=15"
+    try:
+        response = requests.get(url)
+        return response.json()['result'][side]
+    except Exception as e:
+        logger.error(f"エラーが発生しました: {e}")
+        return []
 
-    def sign(message, secret_key):
-        mac = hmac.new(bytes(secret_key, encoding='utf8'), bytes(message, encoding='utf-8'), digestmod='sha256')
-        d = mac.digest()
-        return base64.b64encode(d)
-
-
-    def pre_hash(timestamp, method, request_path, body):
-        return str(timestamp) + str.upper(method) + request_path + body
-
-
-    def parse_params_to_str(params):
-        params = [(key, val) for key, val in params.items()]
-        params.sort(key=lambda x: x[0])
-        url = '?' +toQueryWithNoEncode(params);
-        if url == '?':
-            return ''
-        return url
-
-    def toQueryWithNoEncode(params):
-        url = ''
-        for key, value in params:
-            url = url + str(key) + '=' + str(value) + '&'
-        return url[0:-1]
 
 def calculate_buy_price(asks: List[List[float]], investment: float) -> Tuple[float, float]:
     """
