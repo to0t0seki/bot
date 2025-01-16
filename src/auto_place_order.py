@@ -1,5 +1,5 @@
 from dex_rate_checker import DexRateChecker
-from cex_order_book_checker import get_orderbook_bitget, calculate_sell_price
+from cex_order_book_checker import get_orderbook_bitget, calculate_order
 import time
 from bitgetSpotClient import BitgetSpotClient as client
 client = client()
@@ -20,7 +20,7 @@ def auto_place_order():
 
     oas_bids_orderbook = get_orderbook_bitget('OASUSDT','bids')
 
-    sell_amount, sell_price = calculate_sell_price(oas_bids_orderbook, oas_amount)
+    sell_amount, sell_price = calculate_order(oas_bids_orderbook, oas_amount, False)
 
     print(f"売却数量: {oas_amount:,.2f}")
     print(f"実際に売却可能な数量: {sell_amount:,.2f}")
@@ -46,7 +46,7 @@ def auto_place_order():
 
         oas_bids_orderbook = get_orderbook_bitget('OASUSDT','bids')
 
-        sell_amount, sell_price = calculate_sell_price(oas_bids_orderbook, oas_amount)
+        sell_amount, sell_price = calculate_order(oas_bids_orderbook, oas_amount, False)
 
         print(f"売却数量: {oas_amount:,.2f}")
         print(f"実際に売却可能な数量: {sell_amount:,.2f}")

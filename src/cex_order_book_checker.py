@@ -29,86 +29,46 @@ def get_orderbook_bybit(symbol: str,side: str):
         logger.error(f"エラーが発生しました: {e}")
         return []
 
-
-def calculate_buy_price(asks: List[List[float]], investment: float) -> Tuple[float, float]:
-    """
-    指定資金で取得可能な数量と平均価格を計算する。
-
-    Args:
-        asks (List[List[float]]): オーダーブックのAskリスト。各リストは[価格, 数量]を含む。
-        investment (float): 投資可能な資金（ドル）。
-
-    Returns:
-        Tuple[float, float]: (取得可能な総数量, 平均価格)
-    """
+def calculate_order(orders: List[List[float]], target_quantity: float, is_buy: bool) -> Tuple[float, float]:
     total_quantity = 0.0
-    total_spent = 0.0
-    remaining_investment = investment
+    total_value = 0.0
+    remaining = target_quantity
 
-    for ask in asks:
-        price, quantity = ask
-        cost = price * quantity
+    for order in orders:
+        price, quantity = order
+        if isinstance(price, str):
+            price = float(price)
+        if isinstance(quantity, str):
+            quantity = float(quantity)
 
-        if cost <= remaining_investment:
-            # 全数量を購入
-            total_quantity += quantity
-            total_spent += cost
-            remaining_investment -= cost
+        if is_buy:
+            if price * quantity <= remaining:
+                total_quantity += quantity
+                total_value += price * quantity
+                remaining -= price * quantity
+            else:
+                total_quantity += remaining / price
+                total_value += remaining
+                remaining = 0.0
+                break
         else:
-            # 残り資金で購入可能な数量を計算
-            affordable_quantity = remaining_investment / price
-            total_quantity += affordable_quantity
-            total_spent += affordable_quantity * price
-            remaining_investment = 0.0
-            break  # 資金が尽きたのでループを終了
+            if quantity <= remaining:
+                total_quantity += quantity
+                total_value += price * quantity
+                remaining -= quantity
+            else:
+                total_quantity += remaining
+                total_value += price * remaining
+                remaining = 0
+                break
 
     if total_quantity == 0:
         average_price = 0.0
     else:
-        average_price = total_spent / total_quantity
+        average_price = total_value / total_quantity
 
     return total_quantity, average_price
 
-# def calculate_sell_price(bids: List[List[float]], sell_quantity: float) -> Tuple[float, float]:
-#     """
-#     指定数量を売却する場合の平均価格と売却可能な数量を計算する。
-
-#     Args:
-#         bids (List[List[float]]): オーダーブックのBidsリスト。各リストは[価格, 数量]を含む。
-#         sell_quantity (float): 売却したい数量。
-
-#     Returns:
-#         Tuple[float, float]: (売却可能な数量, 平均価格)
-#     """
-#     total_quantity = 0.0
-#     total_value = 0.0
-#     remaining_quantity = sell_quantity
-
-#     for bid in bids:
-#         price, available_quantity = bid
-#         if isinstance(available_quantity, str):
-#             available_quantity = float(available_quantity)
-#         if isinstance(price, str):
-#             price = float(price)
-
-#         if available_quantity <= remaining_quantity:
-#             # この価格帯の数量をすべて使用
-#             total_quantity += available_quantity
-#             total_value += price * available_quantity
-#             remaining_quantity -= available_quantity
-#         else:
-#             # 残り数量だけ使用
-#             total_quantity += remaining_quantity
-#             total_value += price * remaining_quantity
-#             remaining_quantity = 0
-#             break
-
-#     if total_quantity == 0:
-#         average_price = 0.0
-#     else:
-#         average_price = total_value / total_quantity
-
-#     return total_quantity, average_price
 
 # 使用例
 
