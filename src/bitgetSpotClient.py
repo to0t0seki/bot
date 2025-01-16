@@ -172,25 +172,25 @@ class BitgetSpotClient:
             return {"success": False, "error": f"リクエストエラー: {e}"}
 
 # クライアントのインスタンス化
-client = BitgetSpotClient()
+# client = BitgetSpotClient()
 
-# 注文パラメータ
-symbol = "GEEKUSDT"
-side = "buy"
-order_type = "limit"
-force = "post_only"
-price = "0.0005"
-size = "3000"
+# # 注文パラメータ
+# symbol = "GEEKUSDT"
+# side = "buy"
+# order_type = "limit"
+# force = "post_only"
+# price = "0.0005"
+# size = "3000"
 
-# 注文の発注
-result = client.place_order(symbol, side, order_type, price, size, force)
-logger.info(f"注文結果: {result}")
+# # 注文の発注
+# result = client.place_order(symbol, side, order_type, price, size, force)
+# logger.info(f"注文結果: {result}")
 
-time.sleep(2)
-order_info = client.get_cached_order_info(symbol)
-# get_order_info = client.get_order_info(order_info['orderId'])
-# cancel_result = client.cancel_order(symbol, order_info['orderId'])
-cancel_result = client.cancel_replace_order(symbol, order_info['orderId'], str(float(price)-0.0001), size)
+# time.sleep(2)
+# order_info = client.get_cached_order_info(symbol)
+# # get_order_info = client.get_order_info(order_info['orderId'])
+# # cancel_result = client.cancel_order(symbol, order_info['orderId'])
+# cancel_result = client.cancel_replace_order(symbol, order_info['orderId'], str(float(price)-0.0001), size)
 # logger.info(f"注文キャンセル結果: {cancel_result}")
 
 # client.get_orderbook()

@@ -1,5 +1,5 @@
 from dex_rate_checker import DexRateChecker
-from cex_order_book_checker import CexOrderBookChecker, calculate_buy_price, calculate_sell_price
+from Bybit_order_book_checker import CexOrderBookChecker, calculate_buy_price, calculate_sell_price
 import sys
 
 geek_amount = 938132.0  # 投資資金

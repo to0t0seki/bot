@@ -4,15 +4,26 @@ from typing import List, Tuple
 import time
 import hmac
 import base64
+import logging
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+handler = logging.StreamHandler()
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
 
-class CexOrderBookChecker:
+class BybitOrderBookChecker:
     def __init__(self, symbol: str):
         self.symbol = symbol
         self.base_url = f"https://api.bitget.com/api/v2/spot/market/merge-depth?symbol={symbol}&precision=scale0&limit=15"
 
     def fetch_orderbook(self,side: str):
-        response = requests.get(self.base_url)
-        return response.json()['data'][side]
+        try:
+            response = requests.get(self.base_url)
+            return response.json()['data'][side]
+        except Exception as e:
+            logger.error(f"エラーが発生しました: {e}")
+            return []
 
 def fetch_orderbook_bybit_OAS():
         url = "https://api.bybit.com/v5/market/orderbook?category=spot&symbol=OASUSDT&limit=15"
