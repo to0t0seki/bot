@@ -1,14 +1,13 @@
 import requests
 from typing import List, Tuple
-import logging
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-handler = logging.StreamHandler()
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
 
+from logger_config import setup_logger
+logger = setup_logger(__name__)
+
+class InsufficientLiquidityError(Exception):
+    """オーダーブックの流動性が不足している場合のエラー"""
+    pass
 
    
 def get_orderbook_bitget(symbol: str,side: str):
@@ -16,18 +15,24 @@ def get_orderbook_bitget(symbol: str,side: str):
     try:
         response = requests.get(url)
         return response.json()['data'][side]
+    except requests.exceptions.RequestException as e:
+        logger.error(f"接続エラーが発生しました: {e}")
+        raise
     except Exception as e:
         logger.error(f"エラーが発生しました: {e}")
-        return []
+        raise
 
 def get_orderbook_bybit(symbol: str,side: str):
     url = f"https://api.bybit.com/v5/market/orderbook?category=spot&symbol={symbol}&limit=15"
     try:
         response = requests.get(url)
         return response.json()['result'][side]
+    except requests.exceptions.RequestException as e:
+        logger.error(f"接続エラーが発生しました: {e}")
+        raise
     except Exception as e:
         logger.error(f"エラーが発生しました: {e}")
-        return []
+        raise
 
 def calculate_order(orders: List[List[float]], target_quantity: float, is_buy: bool) -> Tuple[float, float]:
     total_quantity = 0.0
@@ -61,6 +66,15 @@ def calculate_order(orders: List[List[float]], target_quantity: float, is_buy: b
                 total_value += price * remaining
                 remaining = 0
                 break
+    if remaining > 0:
+        processed_ratio = (target_quantity - remaining) / target_quantity * 100
+        error_msg = (
+            f"オーダーブックの流動性が不足しています。"
+            f"目標: {target_quantity:.2f}, "
+            f"処理可能: {target_quantity - remaining:.2f} ({processed_ratio:.1f}%)"
+        )
+        logger.error(error_msg)
+        raise InsufficientLiquidityError("流動性が不足しています")
 
     if total_quantity == 0:
         average_price = 0.0
